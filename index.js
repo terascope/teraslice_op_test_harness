@@ -39,16 +39,45 @@ function runProcessorSpecs(processor) {
  * @module teraslice_processor_test_framework
  */
 module.exports = (op) => {
+    /* A minimal context object */
+    var context = {
+        sysconfig:
+            {
+                teraslice: {
+                    ops_directory: '/Users/godber/Workspace/terascope/gitlab/godber/example_processors/dupedoc_asset/dupedoc'
+                }
+            }
+    };
+
+    var jobValidator = require('teraslice/lib/config/validators/job')(context);
+
+    function jobSpec(op) {
+        return {
+            'operations': [
+                {
+                    '_op': 'noop'
+                },
+                {
+                    '_op': op
+                },
+            ],
+        };
+    }
+
+    var jobConfig = jobValidator.validate(jobSpec(op));
+
+    // console.log(jobConfig);
+    // console.log(jobConfig.operations[1]);
+
     return {
         /* Setup mock contexts for processor, each processor takes:
          *   context - global teraslice/terafoundation context object
-         *   op - configuration of the specific operation being executed (the processor)
+         *   opConfig - configuration of the specific operation being executed (the processor)
          *   jobConfig - details on this jobs configuration
          *   sliceLogger - a logger instance for each slice
          */
-        context: {},
-        op: {'_op': op},
-        jobConfig: {fakeLogger},
+        context: context,
+        opConfig: jobConfig.operations[1], // 1 is the current op, the 0th operation is a noop
 
         /** Fake logger object with empty method definitions.  Suitable for use as
          *  the general teraslice logger or as the sliceLogger.  Implements the
@@ -82,5 +111,12 @@ module.exports = (op) => {
             esLike: sampleDataEsLike
         },
         runProcessorSpecs: runProcessorSpecs,
+        run: function(processor, data) {
+            var myProcessor = processor.newProcessor(
+                context, // context
+                this.opConfig, // opConfig
+                this.jobConfig); // jobConfig
+            return myProcessor(data, fakeLogger.logger);
+        },
     };
 };
