@@ -1,3 +1,37 @@
+var _ = require('lodash');
+var convict = require('convict');
+var convictFormats = require('teraslice/lib/utils/convict_utils');
+
+convictFormats.forEach(function(format) {
+    convict.addFormat(format);
+});
+
+var commonSchema = require('teraslice/lib/config/schemas/job').commonSchema();
+
+/**
+ * Merges the provided inputSchema with commonSchema and then validates the
+ * provided jobConfig or opConfig against the resultant schema.
+ * @param  {Object} inputSchema a convict compatible schema
+ * @param  {Object} config        a jobConfig or opConfig object
+ * @return {Object}             a validated jobConfig or opConfig
+ */
+function validateConfig(inputSchema, inputConfig) {
+    var schema = inputConfig._op ? _.merge(inputSchema, commonSchema) : inputSchema;
+    var config = convict(schema);
+
+    try {
+        config.load(inputConfig);
+        config.validate(/* {strict: true} */);
+    } catch (err) {
+        if (config._op) {
+            throw new Error(`Validation failed for opConfig: ${inputConfig._op} - ${err.message}`);
+        }
+        throw err.stack;
+    }
+
+    return config.getProperties();
+}
+
 // load data
 var sampleDataArrayLike = require('./data/sampleDataArrayLike.json');
 var sampleDataEsLike = require('./data/sampleDataEsLike.json');
@@ -38,18 +72,19 @@ function runProcessorSpecs(processor) {
  * Teraslice Processor Test Framework
  * @module teraslice_processor_test_framework
  */
-module.exports = (op) => {
+module.exports = (processor) => {
+    var op = processor._op;
     /* A minimal context object */
     var context = {
         sysconfig:
             {
                 teraslice: {
-                    ops_directory: '/Users/godber/Workspace/terascope/gitlab/godber/example_processors/dupedoc_asset/dupedoc'
+                    ops_directory: ''
                 }
             }
     };
 
-    var jobValidator = require('teraslice/lib/config/validators/job')(context);
+    var jobSchema = require('teraslice/lib/config/schemas/job').jobSchema(context);
 
     function jobSpec(op) {
         return {
@@ -64,8 +99,13 @@ module.exports = (op) => {
         };
     }
 
-    var jobConfig = jobValidator.validate(jobSpec(op));
+    var jobConfig = validateConfig(jobSchema, jobSpec(op));
+    jobConfig.operations = jobSpec(op).operations.map(function(opConfig) {
+        return validateConfig(processor.schema(), opConfig);
+    });
 
+    // console.log(jobSchema);
+    // console.log(commonSchema);
     // console.log(jobConfig);
     // console.log(jobConfig.operations[1]);
 
@@ -78,6 +118,7 @@ module.exports = (op) => {
          */
         context: context,
         opConfig: jobConfig.operations[1], // 1 is the current op, the 0th operation is a noop
+        jobConfig: jobConfig,
 
         /** Fake logger object with empty method definitions.  Suitable for use as
          *  the general teraslice logger or as the sliceLogger.  Implements the
