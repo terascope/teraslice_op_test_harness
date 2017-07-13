@@ -21,7 +21,22 @@ Now, you can access functionality using the `harness` object.
 The testing harness provides a function `run()`, that will run your processor on
 the data you have passed in to the run function.  The `run()` function returns
 the output data from your processor so you can confirm that it behaved the way
-you expected.
+you expected.  Generally speaking, using `harness.run()` looks like the example
+below. The second argument passed to `run()`, `opConfig` is optional.
+
+```javascript
+var processor = require('../index');
+var harness = require('teraslice_op_test_harness')(processor);
+
+var data = [];
+var opConfig = {option: 3}
+console.log(harness.run(data, opConfig));
+```
+
+The rest of the examples will be implemented as valid unit tests using the
+[jasmine](https://jasmine.github.io) testing framework.  This is a convenient
+way for you to develop and test your Teraslice operations without having to run
+them in Teraslice directly.
 
 The example below shows a processor that, using the default operation settings,
 doesn't change the data in any way:
@@ -42,7 +57,7 @@ If you want to override the default operations used by your processor, you can
 do so by passing in an `opConfig` object with the properties you want to change.
 They will be merged into the default `opConfig` and validated automatically by
 the test harness.  The example below shows the modification of the `percentage`
-property on the job:
+property on the operator:
 
 ```javascript
 var processor = require('../index');
