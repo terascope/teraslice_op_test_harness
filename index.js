@@ -79,14 +79,14 @@ module.exports = (processor) => {
 
     var validator = require('teraslice/lib/config/validators/config')();
 
-    function run(data, extraContext, extraOpConfig) {
-        return Promise.resolve(getProcessor(extraContext, extraOpConfig))
+    function run(data, extraOpConfig, extraContext) {
+        return Promise.resolve(getProcessor(extraOpConfig, extraContext))
             .then(function(proc) {
                 return process(proc, data);
             });
     }
 
-    function getProcessor(extraContext, extraOpConfig) {
+    function getProcessor(extraOpConfig, extraContext) {
         // run the jobConfig and opConfig through the validator to get
         // complete and convict validated configs
         var jobConfig = validator.validateConfig(jobSchema, jobSpec(extraOpConfig));
