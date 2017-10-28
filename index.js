@@ -55,9 +55,7 @@ module.exports = (processor) => {
 
     /**
      * jobSpec returns a simple jobConfig object consisting of two operations,
-     * the first one `noop` and the second one the op being tested.  If the
-     * optional opConfig object is passed in as a second argument it is merged
-     * with the template opConfig for the second operation.
+     * the first one `noop` and the second one the op being tested.
      * @param  {Object} opConfig an optional partial opConfig
      * @return {Object}          a jobConfig object
      */
@@ -87,6 +85,9 @@ module.exports = (processor) => {
     }
 
     function getProcessor(opConfig, extraContext) {
+        if (opConfig == null) {
+            opConfig = {};
+        }
         // run the jobConfig and opConfig through the validator to get
         // complete and convict validated configs
         let jobConfig = validator.validateConfig(jobSchema, jobSpec(opConfig));
