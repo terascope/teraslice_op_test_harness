@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const EventEmitter = require('events').EventEmitter;
 
 // load data
 const sampleDataArrayLike = require('./data/sampleDataArrayLike.json');
@@ -40,8 +41,12 @@ function runProcessorSpecs(processor) {
 
 module.exports = (processor) => {
     /* A minimal context object */
+    const events = new EventEmitter();
     const context = {
         logger: fakeLogger.logger,
+        foundation: {
+            getEventEmitter: () => events
+        },
         sysconfig:
             {
                 teraslice: {

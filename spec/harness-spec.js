@@ -24,3 +24,14 @@ describe('With multiple jobs', function() {
         expect(results[0].yeee).toBeUndefined();
     });
 });
+
+
+describe('event emitter', function() {
+    let baz
+    const harness = require('../index')(require('./processors/bar'));
+    const processor = harness.getProcessor({cb: (i) => baz = i });
+    it('it runs successfully', function() {
+        harness.context.foundation.getEventEmitter().emit('bar');
+        expect(baz).toEqual('baz');
+    });
+});
