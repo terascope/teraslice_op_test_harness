@@ -26,12 +26,12 @@ describe('With multiple jobs', function() {
 });
 
 
-describe('event emitter', function() {
-    let baz
-    const harness = require('../index')(require('./processors/bar'));
-    const processor = harness.getProcessor({cb: (i) => baz = i });
+describe('With event callbacks', function() {
+    const events = [];
+    const harness = require('../index')(require('./processors/events'));
+    harness.run([], {cb: (i) => events.push(i) });
     it('it runs successfully', function() {
-        harness.context.foundation.getEventEmitter().emit('bar');
-        expect(baz).toEqual('baz');
+        expect(events.length).toEqual(1);
+        expect(events[0]).toEqual('worker:shutdown');
     });
 });

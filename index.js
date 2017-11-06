@@ -81,7 +81,9 @@ module.exports = (processor) => {
     const validator = require('teraslice/lib/config/validators/config')();
 
     function run(data, extraOpConfig, extraContext) {
-        return process(getProcessor(extraOpConfig, extraContext), data);
+        let results = process(getProcessor(extraOpConfig, extraContext), data);
+        events.emit('worker:shutdown');
+        return results;
     }
 
     function runAsync(data, extraOpConfig, extraContext) {

@@ -1,11 +1,11 @@
 'use strict';
 
-// Respond to `bar` events with "baz".
+// Call cb(event) for each worker event.
 
 function newProcessor(context, opConfig) {
     const events = context.foundation.getEventEmitter();
-    events.on('bar', () => {
-        opConfig.cb('baz');
+    events.on('worker:shutdown', () => {
+        opConfig.cb('worker:shutdown');
     })
     return function process(data) {
         return [];
@@ -15,7 +15,7 @@ function newProcessor(context, opConfig) {
 function schema() {
     return {
         cb: {
-            doc: 'Callback function'
+            doc: 'Callback function for events.'
         }
     };
 }
