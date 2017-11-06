@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const Promise = require('bluebird');
 const EventEmitter = require('events').EventEmitter;
 
 // load data
@@ -81,14 +82,32 @@ module.exports = (processor) => {
     const validator = require('teraslice/lib/config/validators/config')();
 
     function run(data, extraOpConfig, extraContext) {
-        let results = process(getProcessor(extraOpConfig, extraContext), data);
-        events.emit('worker:shutdown');
-        return results;
+        return process(getProcessor(extraOpConfig, extraContext), data);
     }
 
     function runAsync(data, extraOpConfig, extraContext) {
         return Promise.resolve(getProcessor(extraOpConfig, extraContext))
             .then(proc => process(proc, data));
+    }
+
+    function runSlices(slices, extraOpConfig, extraContext) {
+        const newProcessor = getProcessor(extraOpConfig, extraContext);
+        const results = [];
+        return new Promise((resolve) => {
+            Promise.resolve(slices)
+                .mapSeries(slice => results.push(process(newProcessor, slice)))
+                .then(() => {
+                    // Not yet clear if this is general enough. Trying it out to
+                    // help keep callers simple.
+                    emulateShutdown();
+                })
+                .then(() => {
+                    // Run one last time with empty slice to give processor's
+                    // shutdown logic a chance to flush its state.
+                    results.push(process(newProcessor, []));
+                    resolve(results);
+                });
+        });
     }
 
     function getProcessor(opConfig, extraContext) {
@@ -107,6 +126,10 @@ module.exports = (processor) => {
 
     function process(myProcessor, data) {
         return myProcessor(data, fakeLogger.logger);
+    }
+
+    function emulateShutdown() {
+        events.emit('worker:shutdown');
     }
 
     return {
@@ -153,6 +176,8 @@ module.exports = (processor) => {
         runProcessorSpecs,
         run,
         runAsync,
+        runSlices,
+        emulateShutdown,
         getProcessor,
         process
     };
