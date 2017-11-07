@@ -23,6 +23,7 @@
     "nyc": "^11.2.1"
   },
   "scripts": {
+    "lint": "eslint index.js spec",
     "docs": "jsdoc -P package.json index.js",
     "test": "nyc -x spec/ --reporter=text-summary jasmine && nyc report --reporter=html",
     "testcov": "nyc -x spec/ jasmine && nyc report --reporter=html",

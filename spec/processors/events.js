@@ -6,9 +6,9 @@ function newProcessor(context, opConfig) {
     const events = context.foundation.getEventEmitter();
     events.on('worker:shutdown', () => {
         opConfig.cb('worker:shutdown');
-    })
+    });
     return function process(data) {
-        return [];
+        return data;
     };
 }
 

@@ -1,5 +1,7 @@
 # Teraslice Operation Test Harness
 
+[![Build Status](https://travis-ci.org/terascope/teraslice_op_test_harness.svg?branch=master)](https://travis-ci.org/terascope/teraslice_op_test_harness)
+
 This project provides a processor execution function called `run()`, test data
 sources and common test functions to help you implement tests of your Teraslice
 operations.

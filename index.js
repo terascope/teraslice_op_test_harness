@@ -112,7 +112,7 @@ module.exports = (processor) => {
 
     function getProcessor(opConfig, extraContext) {
         if (opConfig == null) {
-            opConfig = {};
+            opConfig = {}; // eslint-disable-line no-param-reassign
         }
         // run the jobConfig and opConfig through the validator to get
         // complete and convict validated configs
