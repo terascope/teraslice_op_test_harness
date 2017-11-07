@@ -94,7 +94,7 @@ This will process all of the given slices, `emulateShutdown()`, then process a
 final empty slice to give the processor a chance to flush its state.
 
 ```javascript
-var processor = require('../sum);
+var processor = require('../sum');
 var harness = require('teraslice_op_test_harness')(processor);
 
 describe('Add running total', function() {
