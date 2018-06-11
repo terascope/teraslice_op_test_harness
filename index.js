@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const Promise = require('bluebird');
-const EventEmitter = require('events').EventEmitter;
+const { EventEmitter } = require('events');
 
 // load data
 const sampleDataArrayLike = require('./data/sampleDataArrayLike.json');
@@ -125,7 +125,8 @@ module.exports = (processor) => {
         return processor.newProcessor(
             _.merge({}, context, extraContext),
             validator.validateConfig(processor.schema(), opConfig),
-            jobConfig);
+            jobConfig
+        );
     }
 
     function process(myProcessor, data) {
