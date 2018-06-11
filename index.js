@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 const { EventEmitter } = require('events');
+const debug = require('debug')('teraslice-op-test-harness');
 
 // load data
 const sampleDataArrayLike = require('./data/sampleDataArrayLike.json');
@@ -17,12 +18,24 @@ const simpleData = [
 
 const fakeLogger = {
     logger: {
-        fatal() {},
-        error() {},
-        warn() {},
-        info() {},
-        debug() {},
-        trace() {},
+        fatal(...args) {
+            debug('fatal:', ...args);
+        },
+        error(...args) {
+            debug('error:', ...args);
+        },
+        warn(...args) {
+            debug('warn:', ...args);
+        },
+        info(...args) {
+            debug('info:', ...args);
+        },
+        debug(...args) {
+            debug('debug:', ...args);
+        },
+        trace(...args) {
+            debug('trace:', ...args);
+        },
     }
 };
 
