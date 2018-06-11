@@ -1,8 +1,31 @@
 {
-  "name": "teraslice_op_test_harness",
+  "name": "@terascope/teraslice-op-test-harness",
   "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "A testing harness to simplify testing Teraslice processors and operations.",
   "main": "index.js",
+  "scripts": {
+    "docs": "jsdoc -P package.json index.js",
+    "lint": "eslint *.js spec/**/*.js",
+    "lint:fix": "eslint --fix *.js spec/**/*.js",
+    "test": "nyc -x spec/ --reporter=text-summary jasmine && nyc report --reporter=html",
+    "report-coverage": "nyc report --reporter=text-lcov > coverage/coverage.lcov && codecov"
+  },
+  "nyc": {
+    "cache": true,
+    "all": true,
+    "include": [
+      "*.js"
+    ],
+    "reporter": [
+      "text-summary",
+      "html",
+      "lcov",
+      "json"
+    ]
+  },
   "author": "Austin Godber",
   "license": "APACHE",
   "dependencies": {
@@ -11,7 +34,7 @@
     "teraslice": "terascope/teraslice"
   },
   "devDependencies": {
-    "jsdoc": "^3.4.3",
+    "codecov": "^3.0.2",
     "eslint": "^4.6.1",
     "eslint-config-airbnb": "^15.1.0",
     "eslint-plugin-import": "^2.7.0",
@@ -20,13 +43,7 @@
     "eslint-plugin-react": "^7.3.0",
     "jasmine": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",
+    "jsdoc": "^3.4.3",
     "nyc": "^11.2.1"
-  },
-  "scripts": {
-    "lint": "eslint index.js spec",
-    "docs": "jsdoc -P package.json index.js",
-    "test": "nyc -x spec/ --reporter=text-summary jasmine && nyc report --reporter=html",
-    "testcov": "nyc -x spec/ jasmine && nyc report --reporter=html",
-    "showcov": "open coverage/index.html"
   }
 }
